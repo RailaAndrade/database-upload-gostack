@@ -1,6 +1,6 @@
+import { getRepository, getCustomRepository } from 'typeorm';
 import AppError from '../errors/AppError';
-import {getRepository, getCustomRepository} from 'typeorm'
-import TransactionsRepository from '../repositories/TransactionsRepository'
+import TransactionsRepository from '../repositories/TransactionsRepository';
 import Transaction from '../models/Transaction';
 import Category from '../models/Category';
 
@@ -11,23 +11,22 @@ interface Request {
   category: string;
 }
 
-
 class CreateTransactionService {
-  public async execute( {title,
+  public async execute({
+    title,
     value,
     type,
-    category}:Request): Promise<Transaction> {
-    const transactionRepository= getCustomRepository(TransactionsRepository);
-    //const balanceRepository=new TransactionsRepository();
-    const {total}= await transactionRepository.getBalance();
+    category,
+  }: Request): Promise<Transaction> {
+    const transactionRepository = getCustomRepository(TransactionsRepository);
+    // const balanceRepository=new TransactionsRepository();
+    const { total } = await transactionRepository.getBalance();
 
-    if(type==='outcome' && total<value){
-      throw new AppError ('Transaction not allowed');
+    if (type === 'outcome' && total < value) {
+      throw new AppError('Transaction not allowed');
     }
 
-   
     const categoryRepository = getRepository(Category);
-
 
     const categoryExistsWithTitle = await categoryRepository.findOne({
       where: { title: category },
@@ -42,8 +41,6 @@ class CreateTransactionService {
 
       await categoryRepository.save(categoryCreated);
     }
-
-
 
     const transaction = await transactionRepository.create({
       title,
